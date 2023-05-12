@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name        wikipedia_latex_obsidian_friendly_greasemonkey
+// @name        Wikipedia_latex_obsidian_friendly_greasemonkey
 // @namespace   http://tampermonkey.net/
-// @version     1.0
+// @version     1.1
 // @description Display LaTeX instead of formula images in Wikipedia
 // @author      Philo Chang
 // @match       https://*.wikipedia.org/*
@@ -12,7 +12,8 @@
     'use strict';
 
     // Get all the span and img tags in the page
-    var elements = document.querySelectorAll('span.mwe-math-element, img.mwe-math-fallback-image-inline');
+//    var elements = document.querySelectorAll('span.mwe-math-element, img.mwe-math-fallback-image-inline');
+    var elements = document.querySelectorAll('span.mwe-math-element, img.mwe-math-fallback-image-inline, img.mwe-math-fallback-image-display');
 
     // Iterate over the elements
     for (var i = 0; i < elements.length; i++) {
@@ -47,7 +48,12 @@
         } else if (element.tagName.toLowerCase() === 'img') {
             // Get the LaTeX source from the alt attribute
             var alt = element.alt;
-            latex = alt.substring(alt.lastIndexOf('{\\displaystyle ') + 15, alt.lastIndexOf('}.'));
+            if (alt.lastIndexOf('}.') > -1) {
+                latex = alt.substring(alt.lastIndexOf('{\\displaystyle ') + 15, alt.lastIndexOf('}.'));
+            } else {
+                latex = alt.substring(alt.lastIndexOf('{\\displaystyle ') + 15);
+            }
+
 
             // Remove the corresponding '}'
             latex = latex.replace(/}$/g, '');
@@ -95,4 +101,35 @@
         // Remove the link
         link.parentNode.removeChild(link);
     }
+    // Get all the annotation tags on the page
+    var annotationElements = document.querySelectorAll('annotation');
+
+    // Iterate over the annotation elements
+    for ( i = 0; i < annotationElements.length; i++) {
+         element = annotationElements[i];
+
+        // Remove the annotation element
+        element.parentNode.removeChild(element);
+    }
+    // Get all the annotation tags on the page
+    annotationElements = document.querySelectorAll('annotation');
+
+    // Iterate over the annotation elements
+    for (i = 0; i < annotationElements.length; i++) {
+        element = annotationElements[i];
+
+        // Remove the annotation element
+        element.parentNode.removeChild(element);
+    }
+    // Get all the div tags with the class 'mwe-math-mathml-display' and 'mwe-math-mathml-a11y' on the page
+    var divElements = document.querySelectorAll('div.mwe-math-mathml-display.mwe-math-mathml-a11y');
+
+    // Iterate over the div elements
+    for (i = 0; i < divElements.length; i++) {
+        element = divElements[i];
+
+        // Remove the div element
+        element.parentNode.removeChild(element);
+    }
+
 })();
